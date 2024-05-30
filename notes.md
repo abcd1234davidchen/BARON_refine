@@ -13,9 +13,7 @@ Set:
     1001 rounds
     12+1 base station
 
-Loop:   run until first two at least 1001 rounds and 
-
-    set time vector
+Loop:   run until first two at least 1001 rounds and set time vector
 
     2 AMF 12 BS
     AMF 1  0,0
@@ -81,5 +79,4 @@ Loop:   run until first two at least 1001 rounds and
 
     clean data
 end of loop
-
 

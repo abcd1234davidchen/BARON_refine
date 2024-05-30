@@ -40,7 +40,7 @@ int main(){
     vector <float> overall_time3;   //keeps the total execution time for handover case under attack and reconnection with sBS 
 
     int handover_version= 1;    //defines the handover scenario: 0= standard; 1= patched
-    int is_attacker= 1; //defines if there is the attacker: 0 = No ; 1 = Yes
+    int is_attacker= 0; //defines if there is the attacker: 0 = No ; 1 = Yes
     int n_rounds= 1001; //number of simulation runs we want for each case scenario
     int n_bs= 12 + is_attacker*1;    //number of base stations (BS) -> this comprises also the attacker
 

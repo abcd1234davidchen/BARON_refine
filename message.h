@@ -23,7 +23,7 @@ class message{
         int content[10];
         unsigned char token[16];
         int is_token;   //define whether the message has the token field populated
-        int n_content= 0;
+        int n_content;
 
     public:
         message(const char* msg_type, int msg_content[], int n_content);
