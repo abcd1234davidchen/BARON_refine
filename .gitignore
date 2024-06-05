@@ -1,3 +1,3 @@
 *.xls
-./build
+/build/
 ./DS_Store

@@ -40,7 +40,7 @@ int main(){
     vector <float> overall_time3;   //keeps the total execution time for handover case under attack and reconnection with sBS 
 
     int handover_version= 1;    //defines the handover scenario: 0= standard; 1= patched
-    int is_attacker= 0; //defines if there is the attacker: 0 = No ; 1 = Yes
+    int is_attacker= 1; //defines if there is the attacker: 0 = No ; 1 = Yes
     int n_rounds= 1001; //number of simulation runs we want for each case scenario
     int n_bs= 12 + is_attacker*1;    //number of base stations (BS) -> this comprises also the attacker
 
@@ -124,8 +124,8 @@ int main(){
         
         //Print some info of the UE:
         //puts("-- UE creation OK");
-        //printf("UE - location: (%d, %d)\n", ue->get_posX(), ue->get_posY());
-        //printf("UE - connected: %d\n", ue->get_connected());
+        printf("UE - location: (%d, %d)\n", ue->get_posX(), ue->get_posY());
+        printf("UE - connected: %d\n", ue->get_connected());
         //printf("UE - connected AMF: %d\n\n", ue->get_AMF());
 
         //Creation of the ATTACKER -> within ray of 150m w.r.t. UE location
@@ -139,7 +139,7 @@ int main(){
             
             //Print some info of the Attacker:
             //printf("-- ATTACKER creation OK\n");
-            //printf("ATTACKER - location: (%d, %d)\n", bs[12]->get_posX(), bs[12]->get_posY());
+            printf("ATTACKER - location: (%d, %d)\n", bs[12]->get_posX(), bs[12]->get_posY());
             //printf("ATACKER - fake ID: %d\n\n", fake_id);
         }
 
@@ -174,7 +174,7 @@ int main(){
         int best_bs= ue->select_best_bs(channel, n_bs); //select the best BS and target the index
         
         // Print the target BS
-        //printf("UE - target BS: %d\n", best_bs);
+        printf("UE - target BS: %d\n", best_bs);
         
         if(ue->get_connected() != best_bs){
             //if best BS different from the currently connected, then need handover -> by the way of how simulation implmented, this is always true
@@ -183,7 +183,6 @@ int main(){
             ue->transmit_message(msg, "Measurement Report");    //transmit the measurement report message
 
             time.push_back(compute_delay(ue, bs[ue->get_connected()-1], 0));   //compute the transmission delay and save it. -1 because of the disallignement between BS_id and position in bs        
-
 
             //------------------------------------ HANDOVER PROCEDURE ---------------------------------------------//
             
@@ -201,7 +200,7 @@ int main(){
             
             int from= 0;    //contains the index in the msg data stucture of who is the transmitter of the transmitted message
             int to= 0;  //contains the index in the msg data stucture of who is the receiver of the transmitted message
-            printf("\n start ");
+            //printf("\n start ");
             while(handover_completed == 0){ //loop until the handover is completed
 
                 auto start= steady_clock::now();    //start the timer for comoputing the time for message handling
@@ -209,22 +208,18 @@ int main(){
                 //handle_message -> defines how the entity should handle the arrived message, transmitting the corresponding response.
                 //the message is transmitted inside the function                                
                 if(msg[0] != NULL){
-                    printf(" 1 ");
                     ue->handle_message(msg, msg[0], channel, &handover_completed, &type_transmission);  //UE
                     from= 0;    //UE has received the message, so it will be handle and transmit it to someone -> save as transmitter
 
                 }else if(msg[n_bs+1] != NULL){  //AMF-1
-                    printf(" 2 ");
                     amf[0]->handle_message(msg, msg[n_bs+1], &type_transmission); 
                     from= n_bs+1;
 
                 }else if(msg[n_bs+2] != NULL){  //AMF-2
-                    printf(" 3 ");
                     amf[1]->handle_message(msg, msg[n_bs+2], &type_transmission);
                     from= n_bs+2;
 
                 }else{   //BSs
-                    printf(" 4 ");
                     for(int i=1; i<n_bs+1; ++i){    
                         if(msg[i] != NULL){                    
                             bs[i-1]->handle_message(msg, msg[i], &type_transmission);    //i-1 because of the different position in the two arrays
@@ -236,7 +231,7 @@ int main(){
                 auto stop= steady_clock::now(); //stop the timer                
                 auto handling_time = std::chrono::duration_cast<std::chrono::nanoseconds>(stop-start);  //time evaluation for message handling
                 time.push_back(handling_time.count()*1e-9); //store the handling time
-
+                printf("HANDLING TIME: %.9f\n", time[time.size()-1]);
                 // Print which entity has received the message -> channel[i] != NULL
                 //for(int i=0; i<n_bs+3; ++i) printf("Channel[%d]: %p\n\n", i, msg[i]);
 
@@ -245,8 +240,8 @@ int main(){
                 }
 
                 // Print some info about the transmition that happened
-                //printf("Type transmission: %d\n", type_transmission);
-                //printf("From: %d\nTo: %d\n", from, to);
+                printf("Type transmission: %d\n", type_transmission);
+                printf("From: %d\nTo: %d\n", from, to);
 
                 //Compute the transmission time
                 switch(type_transmission){
@@ -277,7 +272,7 @@ int main(){
                     default: ;
                     break;
                 }
-
+                printf("Transmission time: %.9f\n\n", time[time.size()-1]);
             } //#while(!handover_completed)
 
           
@@ -292,7 +287,10 @@ int main(){
 
             //compute the overall run-time execution
             double sum= 0.0;
-            for(int i=0; i<time.size(); ++i)    sum+= time[i];
+            for(int i=0; i<time.size(); ++i){
+                sum+= time[i];
+                printf("Time %2d: %.9f\n", i, time[i]);
+            }
             
             int sBS= ue->get_connected();   //ID of the BS to which UE was connected before handover 
             int tBS= ue->get_target();  //Id of the target BS -> in case of attack, this is the BS for reconnection
@@ -308,7 +306,7 @@ int main(){
                     overall_time1.push_back(sum);   //tBS in sAMF
                 }               
             }
-
+            printf("Execution time: %.9f\n\n", sum);
         } //#if(measurement report)
 
 

@@ -160,7 +160,7 @@ void AMF::handle_message(message* msg_channel[], message* msg, int* type_transmi
 
                 rec_token= rand(); //generate the random value for the reconnection token
 
-                //printf("AMF - reconnection token generated: %d\n", rec_token);
+                printf("AMF%d - reconnection token generated: %d\n",AMF_id, rec_token);
 
                 //conversion into a string
                 unsigned char temp[4];
